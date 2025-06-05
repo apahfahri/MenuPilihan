@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hasil Rekomendasi</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 30px;
+    }
+
+    .resep {
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 8px;
+    }
+    </style>
+</head>
+
+<body>
+  <div style="display: flex; flex-direction: row; justify-items: center; align-items: center; gap: 20px;">  
+    <!-- Tombol kembali -->
+    <a href="/">← Kembali</a>
+    <h1>Hasil Rekomendasi Resep</h1>
+  </div>
+
+  {% if hasil %}
+  {% for resep in hasil %}
+  <div class="resep">
+    <h3>{{ resep.nama }}</h3>
+    <strong>Bahan:</strong>
+    <ul>
+      {% for b in resep.bahan %}
+      <li>{{ b }}</li>
+      {% endfor %}
+    </ul>
+    <strong>Langkah:</strong>
+    <p>{{ resep.langkah }}</p>
+  </div>
+  {% endfor %}
+  {% else %}
+  <p>Tidak ditemukan resep yang cocok.</p>
+  {% endif %}
+  
+</body>
+
+</html>
