@@ -1,50 +1,247 @@
 <!DOCTYPE html>
-<html>
+<html lang="id" class="dark">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hasil Rekomendasi</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 30px;
+  <title>Hasil Rekomendasi Resep</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: { light: '#f97316', dark: '#fdba74' },
+            secondary: { light: '#fb923c', dark: '#fed7aa' },
+            accent: { light: '#ea580c', dark: '#fb923c' },
+            dark: { light: '#1e293b', dark: '#f1f5f9' },
+            light: { light: '#f8fafc', dark: '#0f172a' },
+            card: { light: '#ffffff', dark: '#1e293b' },
+            cardHover: { light: '#f8fafc', dark: '#334155' },
+            text: { light: '#334155', dark: '#e2e8f0' },
+            textSecondary: { light: '#64748b', dark: '#94a3b8' },
+            bg: { light: '#f8fafc', dark: '#0f172a' }
+          }
+        }
+      }
     }
 
-    .resep {
-      border: 1px solid #ccc;
-      padding: 10px;
-      margin: 10px 0;
-      border-radius: 8px;
+    // Fungsi untuk toggle dark mode
+    function toggleDarkMode() {
+      const html = document.documentElement;
+      if (html.classList.contains('dark')) {
+        html.classList.remove('dark');
+        localStorage.setItem('darkMode', 'disabled');
+      } else {
+        html.classList.add('dark');
+        localStorage.setItem('darkMode', 'enabled');
+      }
     }
-    </style>
+
+    // Cek preferensi dark mode saat halaman dimuat
+    document.addEventListener('DOMContentLoaded', function () {
+      if (localStorage.getItem('darkMode') === 'enabled') {
+        document.documentElement.classList.add('dark');
+      } else if (localStorage.getItem('darkMode') === null && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.documentElement.classList.add('dark');
+      }
+    });
+  </script>
+  <style>
+    .food-bg {
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23f97316" opacity="0.1"/><path d="M20,20 Q40,5 60,20 T100,20 Q80,35 60,50 T20,50 Q0,35 20,20Z" fill="%23ea580c" opacity="0.05"/></svg>');
+      background-size: cover;
+    }
+
+    .dark .food-bg {
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23fdba74" opacity="0.05"/><path d="M20,20 Q40,5 60,20 T100,20 Q80,35 60,50 T20,50 Q0,35 20,20Z" fill="%23fb923c" opacity="0.03"/></svg>');
+    }
+
+    .animate-float {
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-8px);
+      }
+    }
+
+    .recipe-card {
+      transition: all 0.3s ease;
+    }
+
+    .recipe-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+
+    .ingredient-list li::before {
+      content: "•";
+      color: #f97316;
+      font-weight: bold;
+      display: inline-block;
+      width: 1em;
+      margin-left: -1em;
+    }
+
+    .dark .ingredient-list li::before {
+      color: #fdba74;
+    }
+
+    .mode-toggle {
+      transition: all 0.3s ease;
+    }
+  </style>
 </head>
 
-<body>
-  <div style="display: flex; flex-direction: row; justify-items: center; align-items: center; gap: 20px;">  
-    <!-- Tombol kembali -->
-    <a href="/">← Kembali</a>
-    <h1>Hasil Rekomendasi Resep</h1>
-  </div>
+<body class="food-bg min-h-screen p-4 sm:p-6 md:p-8 bg-light-light dark:bg-bg-dark">
+  <div class="max-w-6xl mx-auto">
+    <!-- Header dengan tombol kembali -->
+    <div class="flex items-center gap-4 mb-8">
+      <a href="/"
+        class="flex items-center text-primary-light hover:text-accent-light dark:text-primary-dark dark:hover:text-accent-dark font-medium transition-all">
+        <i class="fas fa-arrow-left mr-2"></i>
+        <span>Kembali</span>
+      </a>
+      <h1 class="text-3xl md:text-4xl font-bold text-dark-light dark:text-dark-dark">Hasil Rekomendasi Resep</h1>
 
-  {% if hasil %}
-  {% for resep in hasil %}
-  <div class="resep">
-    <h3>{{ resep.nama }}</h3>
-    <strong>Bahan:</strong>
-    <ul>
-      {% for b in resep.bahan %}
-      <li>{{ b }}</li>
-      {% endfor %}
-    </ul>
-    <strong>Langkah:</strong>
-    <p>{{ resep.langkah }}</p>
+      <!-- Dark mode toggle button -->
+      <button id="darkModeToggle"
+        class="mode-toggle ml-auto bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 p-2 rounded-full transition-all"
+        onclick="toggleDarkMode()">
+        <i class="fas fa-moon dark:hidden"></i>
+        <i class="fas fa-sun hidden dark:block"></i>
+      </button>
+    </div>
+
+    <div class="bg-card-light dark:bg-card-dark rounded-2xl shadow-lg overflow-hidden">
+      <!-- Info Jumlah Resep -->
+      <div
+        class="bg-gradient-to-r from-primary-light/10 to-accent-light/10 dark:from-primary-dark/10 dark:to-accent-dark/10 p-6 border-b border-gray-200 dark:border-gray-700">
+        <div class="flex items-center gap-4">
+          <div class="bg-primary-light dark:bg-primary-dark text-white p-3 rounded-xl">
+            <i class="fas fa-clipboard-list text-2xl"></i>
+          </div>
+          <div>
+            <h2 class="text-xl font-semibold text-dark-light dark:text-dark-dark">Resep yang Cocok dengan Bahan Anda
+            </h2>
+            <p class="text-gray-600 dark:text-textSecondary-dark">Kami menemukan resep yang bisa Anda buat dengan bahan
+              yang tersedia</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Konten Utama -->
+      <div class="p-6">
+        <!-- Jika ada hasil -->
+        {% if hasil %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {% for resep in hasil %}
+          <div
+            class="recipe-card bg-light-light dark:bg-card-dark rounded-xl overflow-hidden border border-gray-100 dark:border-gray-700 hover:border-primary-light/30 dark:hover:border-primary-dark/30">
+            <div class="p-5">
+              <div class="flex items-start gap-3 mb-4">
+                <div class="bg-primary-light/10 dark:bg-primary-dark/10 p-2 rounded-lg">
+                  <i class="fas fa-utensils text-primary-light dark:text-primary-dark text-xl"></i>
+                </div>
+                <div>
+                  <h3 class="text-xl font-bold text-dark-light dark:text-dark-dark">{{ resep.nama }}</h3>
+                  <div class="flex items-center mt-1">
+                    <span
+                      class="text-xs bg-primary-light/10 dark:bg-primary-dark/10 text-primary-light dark:text-primary-dark rounded-full px-2 py-1">
+                      {{ resep.bahan|length }} bahan
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mb-4">
+                <h4 class="font-semibold text-dark-light dark:text-dark-dark mb-2 flex items-center gap-2">
+                  <i class="fas fa-carrot text-primary-light dark:text-primary-dark"></i> Bahan-bahan:
+                </h4>
+                <ul class="ingredient-list text-gray-700 dark:text-textSecondary-dark pl-5 space-y-1">
+                  {% for b in resep.bahan %}
+                  <li>{{ b }}</li>
+                  {% endfor %}
+                </ul>
+              </div>
+
+              <div class="mb-4">
+                <h4 class="font-semibold text-dark-light dark:text-dark-dark mb-2 flex items-center gap-2">
+                  <i class="fas fa-list-ol text-primary-light dark:text-primary-dark"></i> Langkah-langkah:
+                </h4>
+                <p class="text-gray-700 dark:text-textSecondary-dark whitespace-pre-line">{{ resep.langkah }}</p>
+              </div>
+
+              <div class="flex justify-end mt-4">
+                <button
+                  class="text-primary-light hover:text-accent-light dark:text-primary-dark dark:hover:text-accent-dark transition flex items-center gap-1">
+                  <i class="fas fa-bookmark"></i> Simpan Resep
+                </button>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+
+        <div class="mt-8 flex justify-center">
+          <a href="/"
+            class="px-6 py-3 bg-primary-light hover:bg-accent-light dark:bg-primary-dark dark:hover:bg-accent-dark text-white font-medium rounded-lg transition flex items-center gap-2">
+            <i class="fas fa-search"></i> Cari Resep Lain
+          </a>
+        </div>
+        {% else %}
+        <!-- Jika tidak ada hasil -->
+        <div class="text-center py-12">
+          <div class="mx-auto mb-6">
+            <div
+              class="bg-gray-200 dark:bg-gray-700 border-2 border-dashed rounded-xl w-16 h-16 flex items-center justify-center mx-auto">
+              <i class="fas fa-ban text-3xl text-gray-500 dark:text-gray-400"></i>
+            </div>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-700 dark:text-textSecondary-dark mb-2">Tidak ditemukan resep yang
+            cocok</h3>
+          <p class="text-gray-600 dark:text-textSecondary-dark mb-6 max-w-md mx-auto">Maaf, tidak ada resep yang dapat
+            dibuat dengan bahan yang Anda masukkan. Coba tambahkan lebih banyak bahan atau ganti kombinasi bahan.</p>
+          <div class="flex flex-col sm:flex-row gap-3 justify-center">
+            <a href="/"
+              class="px-6 py-3 bg-primary-light hover:bg-accent-light dark:bg-primary-dark dark:hover:bg-accent-dark text-white font-medium rounded-lg transition flex items-center justify-center gap-2">
+              <i class="fas fa-arrow-left"></i> Kembali dan Coba Lagi
+            </a>
+            <a href="/"
+              class="px-6 py-3 bg-card-light dark:bg-card-dark border border-gray-300 dark:border-gray-600 hover:border-primary-light dark:hover:border-primary-dark text-dark-light dark:text-dark-dark font-medium rounded-lg transition flex items-center justify-center gap-2">
+              <i class="fas fa-lightbulb"></i> Lihat Resep Populer
+            </a>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Footer -->
+      <div class="bg-gray-50 dark:bg-slate-800 p-6 text-center text-gray-500 dark:text-textSecondary-dark text-sm">
+        <p>© 2023 Rekomendasi Resep Makanan • Temukan ide masakan kreatif</p>
+      </div>
+    </div>
+
+    <!-- Floating Elements -->
+    <div class="hidden md:block">
+      <div
+        class="absolute top-1/4 left-10 w-16 h-16 rounded-full bg-secondary-light/10 dark:bg-secondary-dark/10 animate-float">
+      </div>
+      <div
+        class="absolute bottom-1/4 right-10 w-20 h-20 rounded-full bg-accent-light/10 dark:bg-accent-dark/10 animate-float animation-delay-2000">
+      </div>
+    </div>
   </div>
-  {% endfor %}
-  {% else %}
-  <p>Tidak ditemukan resep yang cocok.</p>
-  {% endif %}
-  
 </body>
 
 </html>
